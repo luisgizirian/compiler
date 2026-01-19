@@ -1,4 +1,4 @@
-# Commom TS ignore files
+# Common TS ignore files
 node_modules/
 dist/
 build/

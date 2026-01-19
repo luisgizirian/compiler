@@ -1524,7 +1524,7 @@ export class SemanticAnalyzer {
     if (!isBoolean(condType)) {
       this.error(
         expr.condition.location,
-        `Forall condition must be Bool, got ${typeToString(condType)}`
+        `forall condition must be Bool, got ${typeToString(condType)}`
       );
     }
     
@@ -1559,7 +1559,7 @@ export class SemanticAnalyzer {
     if (!isBoolean(condType)) {
       this.error(
         expr.condition.location,
-        `Exists condition must be Bool, got ${typeToString(condType)}`
+        `exists condition must be Bool, got ${typeToString(condType)}`
       );
     }
     

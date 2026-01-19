@@ -1,3 +1,5 @@
+> **Disclaimer:** The project is based on a sample lesson I asked GH Copilot to put together on writing a compiler for a simple language now in the LLM era. It's not intended to be a usable or even complete project. It's more on the realms of becoming a learning journey throughout the intricacies of compiler programming and building. Many unknowns yet.
+
 # Intent Programming Language
 
 **Intent** is a programming language designed for the LLM era, focusing on **machine-verifiable intent**, **semantic clarity**, and **long-lived system preservation**.

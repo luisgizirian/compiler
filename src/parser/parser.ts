@@ -1525,7 +1525,7 @@ export class Parser {
     }
 
     if (this.match(TokenType.BIT_AND)) {
-      const isMutable = this.match(TokenType.MUT);
+      this.match(TokenType.MUT);
       const operand = this.unary();
       return {
         kind: 'UnaryExpression',
