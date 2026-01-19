@@ -1,0 +1,119 @@
+// Sorting Example in Intent
+// Demonstrates intents, pure functions, and verification
+
+// Intent: define what it means for an array to be sorted
+intent Sorted<T: Ord> {
+    @ensures forall i in 0..result.len() - 1: result[i] <= result[i + 1]
+    @ensures result.len() == input.len()
+    @ensures forall x in input: result.contains(x)
+}
+
+// Pure function - no side effects allowed
+pure fn bubbleSort<T: Ord>(input: [T]) -> [T]
+    @intent Sorted<T>
+{
+    let mut arr = input.clone()
+    let n = arr.len()
+    
+    for i in 0..n {
+        for j in 0..(n - i - 1) {
+            if arr[j] > arr[j + 1] {
+                // Swap elements
+                let temp = arr[j]
+                arr[j] = arr[j + 1]
+                arr[j + 1] = temp
+            }
+        }
+    }
+    
+    return arr
+}
+
+// Binary search with contracts
+pure fn binarySearch<T: Ord>(arr: [T], target: T) -> Option<Int>
+    @requires forall i in 0..arr.len() - 1: arr[i] <= arr[i + 1]
+    @ensures match result {
+        Some(idx) => arr[idx] == target,
+        None => forall x in arr: x != target,
+    }
+{
+    let mut low = 0
+    let mut high = arr.len() - 1
+    
+    while low <= high 
+        @invariant low >= 0
+        @invariant high < arr.len()
+    {
+        let mid = (low + high) / 2
+        
+        match arr[mid].compare(target) {
+            Ordering::Equal => return Some(mid),
+            Ordering::Less => low = mid + 1,
+            Ordering::Greater => high = mid - 1,
+        }
+    }
+    
+    return None
+}
+
+// Quicksort with partition function
+pure fn partition<T: Ord>(arr: mut [T], low: Int, high: Int) -> Int
+    @requires low >= 0
+    @requires high < arr.len()
+    @requires low <= high
+    @ensures result >= low
+    @ensures result <= high
+    @ensures forall i in low..result: arr[i] <= arr[result]
+    @ensures forall i in (result + 1)..=high: arr[i] > arr[result]
+{
+    let pivot = arr[high]
+    let mut i = low - 1
+    
+    for j in low..high {
+        if arr[j] <= pivot {
+            i += 1
+            let temp = arr[i]
+            arr[i] = arr[j]
+            arr[j] = temp
+        }
+    }
+    
+    let temp = arr[i + 1]
+    arr[i + 1] = arr[high]
+    arr[high] = temp
+    
+    return i + 1
+}
+
+pure fn quickSort<T: Ord>(arr: mut [T], low: Int, high: Int) -> Void
+    @requires low >= 0
+    @requires high < arr.len() || high < 0
+    @ensures forall i in low..high: arr[i] <= arr[i + 1]
+{
+    if low < high {
+        let pi = partition(arr, low, high)
+        quickSort(arr, low, pi - 1)
+        quickSort(arr, pi + 1, high)
+    }
+}
+
+// Main demonstration
+fn main() -> Void @effect[IO] {
+    let numbers = [64, 34, 25, 12, 22, 11, 90]
+    
+    IO.write("Original array: " + numbers.toString())
+    
+    let sorted = bubbleSort(numbers)
+    IO.write("Sorted array: " + sorted.toString())
+    
+    // Search for an element
+    match binarySearch(sorted, 25) {
+        Some(idx) => IO.write("Found 25 at index " + idx.toString()),
+        None => IO.write("25 not found"),
+    }
+    
+    match binarySearch(sorted, 100) {
+        Some(idx) => IO.write("Found 100 at index " + idx.toString()),
+        None => IO.write("100 not found"),
+    }
+}

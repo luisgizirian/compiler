@@ -1,0 +1,48 @@
+{
+  "name": "intent-lang",
+  "version": "1.0.0",
+  "description": "Intent - A programming language designed for the LLM era with contracts, effects, and machine-verifiable semantics",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "intent": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "node --test dist/**/*.test.js",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src/**/*.ts",
+    "prepublishOnly": "npm run build",
+    "example": "npm run build && node dist/cli.js run examples/hello.intent"
+  },
+  "keywords": [
+    "programming-language",
+    "compiler",
+    "contracts",
+    "effects",
+    "verification",
+    "llm",
+    "intent",
+    "type-system"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luisgizirian/compiler.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}
