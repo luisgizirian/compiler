@@ -12,16 +12,9 @@
 import * as AST from '../parser/ast';
 import {
   Type,
-  PrimitiveType,
   StructType,
   EnumType,
   FunctionType,
-  ArrayType,
-  TupleType,
-  OptionalType,
-  ResultType,
-  ReferenceType,
-  TypeVariable,
   EffectType,
   CapabilityType,
   PRIMITIVES,
@@ -36,7 +29,7 @@ import {
   isInteger,
   createTypeVariable,
 } from './types';
-import { SymbolTable, Scope, Symbol, ContractSymbol, IntentSymbol } from './symbols';
+import { SymbolTable, ContractSymbol, IntentSymbol } from './symbols';
 import { SourceLocation } from '../lexer/token';
 
 export interface SemanticError {

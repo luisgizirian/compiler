@@ -7,7 +7,6 @@
 
 import * as AST from '../parser/ast';
 import { AnalysisResult } from '../analyzer/analyzer';
-import { Type, typeToString } from '../analyzer/types';
 
 export interface GeneratorOptions {
   target: 'javascript' | 'typescript';
@@ -29,12 +28,12 @@ export class JavaScriptGenerator {
   private output: string[] = [];
   private indentLevel = 0;
   private options: GeneratorOptions;
-  private analysisResult: AnalysisResult;
+  // private analysisResult: AnalysisResult;  // Reserved for future use
   private currentFunction: AST.FunctionDeclaration | null = null;
 
-  constructor(analysisResult: AnalysisResult, options: Partial<GeneratorOptions> = {}) {
+  constructor(_analysisResult: AnalysisResult, options: Partial<GeneratorOptions> = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
-    this.analysisResult = analysisResult;
+    // _analysisResult reserved for future use
   }
 
   generate(program: AST.Program): string {

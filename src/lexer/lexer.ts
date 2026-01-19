@@ -32,7 +32,6 @@ export class Lexer {
   private current = 0;
   private line = 1;
   private column = 1;
-  private lineStart = 0;
   private file?: string;
 
   constructor(source: string, file?: string) {
@@ -204,7 +203,6 @@ export class Lexer {
       case '\n':
         this.line++;
         this.column = 1;
-        this.lineStart = this.current;
         break;
 
       // Literals
@@ -249,7 +247,6 @@ export class Lexer {
         if (this.peek() === '\n') {
           this.line++;
           this.column = 0;
-          this.lineStart = this.current + 1;
         }
         this.advance();
       }
@@ -269,7 +266,6 @@ export class Lexer {
       if (this.peek() === '\n') {
         this.line++;
         this.column = 0;
-        this.lineStart = this.current + 1;
       }
       if (this.peek() === '\\') {
         this.advance();

@@ -250,7 +250,7 @@ function handleCheck(options: CLIOptions): number {
     }
 
     const source = fs.readFileSync(absolutePath, 'utf-8');
-    const { ast, analysisResult, errors } = compiler.analyzeOnly(source, file);
+    const { analysisResult, errors } = compiler.analyzeOnly(source, file);
 
     // Show warnings
     for (const warning of analysisResult.warnings) {

@@ -5,10 +5,10 @@
  * Lexer → Parser → Analyzer → Code Generator
  */
 
-import { Lexer, tokenize, Token, LexerError } from './lexer';
-import { Parser, parse, ParseError, Program } from './parser';
-import { SemanticAnalyzer, analyze, AnalysisResult, SemanticError } from './analyzer';
-import { JavaScriptGenerator, generateJavaScript, GeneratorOptions } from './codegen';
+import { tokenize, Token } from './lexer';
+import { parse, Program } from './parser';
+import { analyze, AnalysisResult } from './analyzer';
+import { generateJavaScript } from './codegen';
 
 export interface CompilerOptions {
   // Target language

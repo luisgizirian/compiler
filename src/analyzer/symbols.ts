@@ -7,14 +7,7 @@
 
 import {
   Type,
-  FunctionType,
-  StructType,
-  EnumType,
-  TraitType,
-  EffectType,
-  CapabilityType,
   TypeVariable,
-  VOID_TYPE,
 } from './types';
 
 export interface Symbol {
