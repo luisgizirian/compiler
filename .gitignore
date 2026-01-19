@@ -1,0 +1,30 @@
+# Commom TS ignore files
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+# Optional eslint cache
+.eslintcache
+# Optional stylelint cache
+.stylelintcache
+# Yarn Integrity file
+.yarn-integrity
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+.env.local
+.env.*.local

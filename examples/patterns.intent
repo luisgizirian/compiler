@@ -1,0 +1,119 @@
+// Pattern Matching Example in Intent
+// Demonstrates enum variants, pattern matching, and guards
+
+enum Shape {
+    Circle(Float64),           // radius
+    Rectangle(Float64, Float64), // width, height
+    Triangle(Float64, Float64, Float64), // sides
+    Point,
+}
+
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+enum Option<T> {
+    Some(T),
+    None,
+}
+
+// Calculate area using pattern matching
+pure fn area(shape: Shape) -> Float64
+    @ensures result >= 0.0
+{
+    match shape {
+        Shape::Circle(radius) => 3.14159 * radius * radius,
+        Shape::Rectangle(w, h) => w * h,
+        Shape::Triangle(a, b, c) => {
+            // Heron's formula
+            let s = (a + b + c) / 2.0
+            (s * (s - a) * (s - b) * (s - c)).sqrt()
+        },
+        Shape::Point => 0.0,
+    }
+}
+
+// Pattern matching with guards
+pure fn describe(shape: Shape) -> String {
+    match shape {
+        Shape::Circle(r) if r > 100.0 => "Large circle",
+        Shape::Circle(r) if r > 10.0 => "Medium circle",
+        Shape::Circle(_) => "Small circle",
+        
+        Shape::Rectangle(w, h) if w == h => "Square",
+        Shape::Rectangle(w, h) if w > h => "Wide rectangle",
+        Shape::Rectangle(_, _) => "Tall rectangle",
+        
+        Shape::Triangle(a, b, c) if a == b && b == c => "Equilateral triangle",
+        Shape::Triangle(a, b, _) if a == b => "Isosceles triangle",
+        Shape::Triangle(_, _, _) => "Scalene triangle",
+        
+        Shape::Point => "Point (no area)",
+    }
+}
+
+// Nested pattern matching with Result and Option
+fn processResult<T, E>(result: Result<Option<T>, E>) -> String {
+    match result {
+        Result::Ok(Option::Some(value)) => "Got value",
+        Result::Ok(Option::None) => "Got nothing",
+        Result::Err(e) => "Got error",
+    }
+}
+
+// Destructuring in let bindings
+fn example() -> Void @effect[IO] {
+    let shapes = [
+        Shape::Circle(5.0),
+        Shape::Rectangle(10.0, 20.0),
+        Shape::Triangle(3.0, 4.0, 5.0),
+        Shape::Point,
+        Shape::Circle(150.0),
+        Shape::Rectangle(15.0, 15.0),
+    ]
+    
+    for shape in shapes {
+        let desc = describe(shape)
+        let a = area(shape)
+        IO.write(desc + " - Area: " + a.toString())
+    }
+}
+
+// Struct destructuring
+struct Person {
+    name: String,
+    age: Int,
+    email: Option<String>,
+}
+
+fn greet(person: Person) -> String {
+    match person {
+        Person { name, age, email: Option::Some(e) } if age >= 18 => 
+            "Hello, " + name + "! Contact: " + e,
+        
+        Person { name, age, email: Option::Some(_) } => 
+            "Hi, " + name + "! (Minor)",
+        
+        Person { name, email: Option::None, .. } => 
+            "Hello, " + name + "!",
+    }
+}
+
+fn main() -> Void @effect[IO] {
+    IO.write("=== Shape Examples ===")
+    example()
+    
+    IO.write("")
+    IO.write("=== Person Examples ===")
+    
+    let people = [
+        Person { name: "Alice", age: 30, email: Option::Some("alice@example.com") },
+        Person { name: "Bob", age: 15, email: Option::Some("bob@example.com") },
+        Person { name: "Charlie", age: 25, email: Option::None },
+    ]
+    
+    for person in people {
+        IO.write(greet(person))
+    }
+}

@@ -1,0 +1,12 @@
+// Hello World in Intent
+// Demonstrates basic function declaration with effects
+
+effect IO {
+    fn write(s: String) -> Void
+    fn read() -> String
+}
+
+fn main() -> Void @effect[IO] {
+    IO.write("Hello, Intent!")
+    IO.write("Welcome to the LLM-era programming language.")
+}

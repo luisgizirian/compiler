@@ -1,0 +1,114 @@
+// Capability Example in Intent
+// Demonstrates capability-based security
+
+// Define capabilities
+capability FileSystem {
+    read: Bool,
+    write: Bool,
+    execute: Bool,
+}
+
+capability Network {
+    connect: Bool,
+    listen: Bool,
+    maxConnections: Int,
+}
+
+capability SystemInfo {
+    readEnv: Bool,
+    readTime: Bool,
+}
+
+// Effects that require capabilities
+effect FileIO {
+    fn readFile(path: String) -> Result<String, IOError>
+    fn writeFile(path: String, content: String) -> Result<Void, IOError>
+    fn deleteFile(path: String) -> Result<Void, IOError>
+}
+
+effect NetworkIO {
+    fn connect(host: String, port: Int) -> Result<Connection, NetworkError>
+    fn listen(port: Int) -> Result<Listener, NetworkError>
+}
+
+// Function that only needs read capability
+fn loadConfig(path: String) -> Result<Config, Error>
+    @capability FileSystem { read: true, write: false, execute: false }
+    @effect[FileIO]
+{
+    let content = FileIO.readFile(path)?
+    return parseConfig(content)
+}
+
+// Function that needs both read and write
+fn saveConfig(path: String, config: Config) -> Result<Void, Error>
+    @capability FileSystem { read: true, write: true, execute: false }
+    @effect[FileIO]
+{
+    let content = config.serialize()
+    FileIO.writeFile(path, content)?
+    return Ok(())
+}
+
+// Function that needs network capabilities
+fn fetchRemoteData(url: String) -> Result<String, Error>
+    @capability Network { connect: true, listen: false, maxConnections: 10 }
+    @effect[NetworkIO]
+{
+    let conn = NetworkIO.connect(url, 443)?
+    let data = conn.read()?
+    conn.close()
+    return Ok(data)
+}
+
+// Server function needs listen capability
+fn startServer(port: Int) -> Result<Void, Error>
+    @capability Network { connect: false, listen: true, maxConnections: 100 }
+    @effect[NetworkIO, IO]
+{
+    let listener = NetworkIO.listen(port)?
+    IO.write("Server listening on port " + port.toString())
+    
+    while true {
+        let conn = listener.accept()?
+        handleConnection(conn)
+    }
+}
+
+// Sandbox: function with minimal capabilities
+fn processSandboxed(data: String) -> String
+    @capability FileSystem { read: false, write: false, execute: false }
+    @capability Network { connect: false, listen: false, maxConnections: 0 }
+{
+    // Can only do pure computation here
+    // No file access, no network access
+    return data.toUpperCase()
+}
+
+// Main entry point shows capability requirements
+fn main() -> Result<Void, Error>
+    @capability FileSystem { read: true, write: true, execute: false }
+    @capability Network { connect: true, listen: false, maxConnections: 5 }
+    @effect[IO, FileIO, NetworkIO]
+{
+    IO.write("Starting application with capabilities:")
+    IO.write("- FileSystem: read, write")
+    IO.write("- Network: connect")
+    
+    // Load configuration
+    let config = loadConfig("config.json")?
+    IO.write("Config loaded")
+    
+    // Fetch remote data
+    let data = fetchRemoteData("https://api.example.com/data")?
+    IO.write("Remote data fetched")
+    
+    // Process in sandbox (no capabilities needed)
+    let processed = processSandboxed(data)
+    
+    // Save results
+    saveConfig("output.json", Config { data: processed })?
+    IO.write("Results saved")
+    
+    return Ok(())
+}

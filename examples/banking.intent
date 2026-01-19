@@ -1,0 +1,85 @@
+// Banking Example in Intent
+// Demonstrates contracts, effects, and invariants
+
+effect Database {
+    fn query(sql: String) -> Result<String, DbError>
+    fn execute(sql: String) -> Result<Void, DbError>
+}
+
+effect Logging {
+    fn log(level: String, message: String) -> Void
+}
+
+// Account with invariant: balance must never be negative
+struct Account {
+    id: String,
+    owner: String,
+    balance: Float64,
+    
+    @invariant balance >= 0.0
+}
+
+// Contract defining safe transfer properties
+contract SafeTransfer {
+    @requires amount > 0.0
+    @requires from.balance >= amount
+    @ensures from.balance == old(from.balance) - amount
+    @ensures to.balance == old(to.balance) + amount
+}
+
+// Intent: money is conserved in transfers
+intent MoneyConservation {
+    @ensures from.balance + to.balance == old(from.balance) + old(to.balance)
+}
+
+// Transfer function with contract and intent
+fn transfer(
+    from: mut Account,
+    to: mut Account,
+    amount: Float64
+) -> Result<Void, TransferError>
+    @contract SafeTransfer
+    @intent MoneyConservation
+    @effect[Database, Logging]
+{
+    Logging.log("INFO", "Initiating transfer of " + amount.toString())
+    
+    // Perform the transfer
+    from.balance -= amount
+    to.balance += amount
+    
+    // Persist to database
+    Database.execute("UPDATE accounts SET balance = ...")?
+    
+    Logging.log("INFO", "Transfer completed successfully")
+    
+    return Ok(())
+}
+
+// Helper function to create a new account
+fn createAccount(id: String, owner: String, initialBalance: Float64) -> Result<Account, Error>
+    @requires initialBalance >= 0.0
+    @ensures result.balance == initialBalance
+{
+    return Ok(Account { id: id, owner: owner, balance: initialBalance })
+}
+
+// Main entry point
+fn main() -> Result<Void, Error> @effect[IO, Database, Logging] {
+    // Create accounts
+    let alice = createAccount("ACC001", "Alice", 1000.0)?
+    let bob = createAccount("ACC002", "Bob", 500.0)?
+    
+    IO.write("Initial balances:")
+    IO.write("Alice: " + alice.balance.toString())
+    IO.write("Bob: " + bob.balance.toString())
+    
+    // Transfer money
+    transfer(alice, bob, 250.0)?
+    
+    IO.write("After transfer:")
+    IO.write("Alice: " + alice.balance.toString())
+    IO.write("Bob: " + bob.balance.toString())
+    
+    return Ok(())
+}
